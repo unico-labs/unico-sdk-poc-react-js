@@ -1,6 +1,5 @@
 import './App.css';
 import { UnicoCheckBuilder, SelfieCameraTypes, UnicoThemeBuilder, DocumentCameraTypes } from 'unico-webframe';
-// import { UnicoCheckBuilder, SelfieCameraTypes, UnicoThemeBuilder, DocumentCameraTypes } from 'unico-webframe';
 
 const callback = {
   on: {
@@ -38,13 +37,9 @@ const CameraSDK = () => {
     .setTheme(unicoTheme)
     .build();
 
-  // const cameraPromised = unicoCamera.prepareSelfieCamera("/services.json", SelfieCameraTypes.NORMAL);
-
-  // cameraPromised.then(cameraOpener => cameraOpener.open(callback));
-
   const openSelfieCameraNormal = async () => {
     const cameraPromised = unicoCamera
-      .prepareSelfieCamera("/web_s_ft_service.json", SelfieCameraTypes.NORMAL)
+      .prepareSelfieCamera("/unico-credentials.json", SelfieCameraTypes.NORMAL)
       .catch(()=>console.error('Error initializing normal camera'));;
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
@@ -52,7 +47,7 @@ const CameraSDK = () => {
   
   const openSelfieCameraSmart = async () => {
     const cameraPromised = unicoCamera
-      .prepareSelfieCamera("/web_s_ft_service.json", SelfieCameraTypes.SMART)
+      .prepareSelfieCamera("/unico-credentials.json", SelfieCameraTypes.SMART)
       .catch(()=>console.error('Error initializing smart camera'));
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
@@ -60,15 +55,15 @@ const CameraSDK = () => {
 
   const openSelfieCameraLiveness = async () => {
     const cameraPromised = unicoCamera
-      .prepareSelfieCamera("/web_c_ft_service.json", SelfieCameraTypes.SMART)
-      // .catch(()=>console.error('Error initializing liveness camera'));
+      .prepareSelfieCamera("/unico-credentials-liveness.json", SelfieCameraTypes.SMART)
+      .catch(()=>console.error('Error initializing liveness camera'));
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
   }
 
   const openDocumentCameraCNH = async () => {
     const cameraPromised = unicoCamera
-      .prepareDocumentCamera("/web_c_ft_service.json", DocumentCameraTypes.CNH)
+      .prepareDocumentCamera("/unico-credentials.json", DocumentCameraTypes.CNH)
       .catch(()=>console.error('Error initializing CNH camera'));
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
@@ -76,7 +71,7 @@ const CameraSDK = () => {
 
   const openDocumentCameraOutros = async () => {
     const cameraPromised = unicoCamera
-      .prepareDocumentCamera("/web_c_ft_service.json", DocumentCameraTypes.OTHERS("Teste"))
+      .prepareDocumentCamera("/unico-credentials.json", DocumentCameraTypes.OTHERS("Teste"))
       .catch(()=>console.error('Error initializing other documents camera'));
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
@@ -84,9 +79,6 @@ const CameraSDK = () => {
 
   return (
     <>
-      {/* <div id="box-camera">
-        Sem FaceTech
-      </div> */}
       <button
         type="button"
         onClick={() => openSelfieCameraNormal()}
