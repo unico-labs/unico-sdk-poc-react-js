@@ -1,128 +1,40 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route, Outlet, Link } from "react-router-dom";
 import './App.css';
-import { UnicoCheckBuilder, SelfieCameraTypes, UnicoThemeBuilder, DocumentCameraTypes } from 'unico-webframe';
+import Cameras from "./Cameras";
+import Home from "./Home";
 
-const callback = {
-  on: {
-    success: function(obj) {
-      console.log(obj.base64);
-    },
-    error: function(error) {
-      console.error(error)
-      //confira na aba "Configurações" sobre os tipos de erros
-    }
-  }
-};
-
-const CameraSDK = () => {
-
-  const unicoTheme = new UnicoThemeBuilder()
-    .setColorSilhouetteSuccess("#0384fc")
-    .setColorSilhouetteError("#D50000")
-    .setColorSilhouetteNeutral("#fcfcfc")
-    .setBackgroundColor("#dff1f5")
-    .setColorText("#0384fc")
-    .setBackgroundColorComponents("#0384fc")
-    .setColorTextComponents("#dff1f5")
-    .setBackgroundColorButtons("#0384fc")
-    .setColorTextButtons("#dff1f5")
-    .setBackgroundColorBoxMessage("#fff")
-    .setColorTextBoxMessage("#000")
-    .setHtmlPopupLoading(`<div style="position: absolute; top: 45%; right: 50%; transform:
-    translate(50%, -50%); z-index: 10; text-align: center;">Carregando...</div>`)
-    .build();
-
-  const unicoCamera = new UnicoCheckBuilder()
-    .setResourceDirectory("/resources")
-    .setModelsPath("/models")
-    .setTheme(unicoTheme)
-    .build();
-
-  const openSelfieCameraNormal = async () => {
-    const cameraPromised = unicoCamera
-      .prepareSelfieCamera("/unico-credentials.json", SelfieCameraTypes.NORMAL)
-      .catch(()=>console.error('Error initializing normal camera'));;
-    
-    cameraPromised.then(cameraOpener => cameraOpener.open(callback));
-  }
-  
-  const openSelfieCameraSmart = async () => {
-    const cameraPromised = unicoCamera
-      .prepareSelfieCamera("/unico-credentials.json", SelfieCameraTypes.SMART)
-      .catch(()=>console.error('Error initializing smart camera'));
-    
-    cameraPromised.then(cameraOpener => cameraOpener.open(callback));
-  }
-
-  const openSelfieCameraLiveness = async () => {
-    const cameraPromised = unicoCamera
-      .prepareSelfieCamera("/unico-credentials-liveness.json", SelfieCameraTypes.SMART)
-      .catch(()=>console.error('Error initializing liveness camera'));
-    
-    cameraPromised.then(cameraOpener => cameraOpener.open(callback));
-  }
-
-  const openDocumentCameraCNH = async () => {
-    const cameraPromised = unicoCamera
-      .prepareDocumentCamera("/unico-credentials.json", DocumentCameraTypes.CNH)
-      .catch(()=>console.error('Error initializing CNH camera'));
-    
-    cameraPromised.then(cameraOpener => cameraOpener.open(callback));
-  }
-
-  const openDocumentCameraOutros = async () => {
-    const cameraPromised = unicoCamera
-      .prepareDocumentCamera("/unico-credentials.json", DocumentCameraTypes.OTHERS("Teste"))
-      .catch(()=>console.error('Error initializing other documents camera'));
-    
-    cameraPromised.then(cameraOpener => cameraOpener.open(callback));
-  }
-
+export default function App() {
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => openSelfieCameraNormal()}
-      >
-        Camera Normal
-      </button>
-      <button
-        type="button"
-        onClick={() => openSelfieCameraSmart()}
-      >
-        Camera Smart
-      </button>
-      <button
-        type="button"
-        onClick={() => openSelfieCameraLiveness()}
-      >
-        Camera Liveness
-      </button>
-      <button
-        type="button"
-        onClick={() => openDocumentCameraCNH()}
-      >
-        Camera CNH
-      </button>
-      <button
-        type="button"
-        onClick={() => openDocumentCameraOutros()}
-      >
-        Camera Outros
-      </button>
-      <div className="container">
-        <div id="box-camera">
-        </div>
-      </div>
-    </>
-  );
-};
-
-function App() {
-  return (
-    <div className="App">
-      <CameraSDK />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="cameras" element={<Cameras />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
-export default App;
+const Layout = () => {
+  return (
+    <>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/cameras">Cameras</Link>
+          </li>
+        </ul>
+      </nav>
+      <Outlet />
+    </>
+  )
+};
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
