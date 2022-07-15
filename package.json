@@ -9,7 +9,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "5.0.1",
-    "unico-webframe": "^3.5.1",
+    "unico-webframe": "^3.4.2",
     "util": "^0.12.4",
     "web-vitals": "^2.1.4"
   },
