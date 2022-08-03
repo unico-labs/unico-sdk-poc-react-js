@@ -37,12 +37,3 @@
     transform: rotate(360deg);
   }
 }
-
-
-.container {
-  width: 800px;
-  height: 600px;
-  position: relative;
-  border-style: solid;
-  margin-left: 15%;
-}
