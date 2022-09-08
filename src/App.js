@@ -4,11 +4,12 @@ import { UnicoCheckBuilder, SelfieCameraTypes, UnicoThemeBuilder, DocumentCamera
 const callback = {
   on: {
     success: function(obj) {
-      console.log(obj.base64);
+      console.log("success");
+      // console.log(obj.encrypted);
     },
     error: function(error) {
-      console.error(error)
-      //confira na aba "Configurações" sobre os tipos de erros
+      console.log('errorMessage');
+      console.error(error);
     }
   }
 };
@@ -40,7 +41,7 @@ const CameraSDK = () => {
   const openSelfieCameraNormal = async () => {
     const cameraPromised = unicoCamera
       .prepareSelfieCamera("/unico-credentials.json", SelfieCameraTypes.NORMAL)
-      .catch(()=>console.error('Error initializing normal camera'));;
+      .catch(()=>console.error('Error initializing normal camera'));
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
   }
