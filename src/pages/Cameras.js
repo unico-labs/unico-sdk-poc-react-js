@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UnicoCheckBuilder, SelfieCameraTypes, UnicoThemeBuilder, DocumentCameraTypes } from 'unico-webframe';
 import "./Cameras.css"
+import packageJson from "../../package.json";
 
 const Cameras = () => {
   const navigate = useNavigate();
@@ -61,7 +62,10 @@ const Cameras = () => {
   const openSelfieCameraLiveness = async () => {
     const cameraPromised = unicoCamera
       .prepareSelfieCamera("/unico-credentials-liveness.json", SelfieCameraTypes.SMART)
-      .catch(()=>console.error('Error initializing liveness camera'));
+      .catch((e)=>{
+          console.error('Error initializing liveness camera');
+          console.error(e);
+        });
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
   }
@@ -84,6 +88,9 @@ const Cameras = () => {
 
   return (
     <>
+      <h2>
+        Bem vindo a POC do Unico SDK Web v{packageJson.dependencies['unico-webframe']}
+      </h2>
       <div class="buttons">
         <button
           type="button"
