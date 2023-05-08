@@ -5,6 +5,8 @@ import "./Cameras.css"
 import packageJson from "../../package.json";
 
 const Cameras = () => {
+  console.log("Loading, camera page");
+
   const navigate = useNavigate();
 
   const callback = {
