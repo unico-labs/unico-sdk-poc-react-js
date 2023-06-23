@@ -2,7 +2,7 @@ name: Checkmarx AST scan
 on: 
   [push, pull_request]
 jobs:  
-  pull_request_with_block:
+  pull_request_with_block: 
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
