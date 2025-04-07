@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UnicoCheckBuilder, SelfieCameraTypes, UnicoThemeBuilder, DocumentCameraTypes } from 'unico-webframe';
+import { UnicoCheckBuilder, SelfieCameraTypes, UnicoThemeBuilder, DocumentCameraTypes, UnicoConfig, SDKEnvironmentTypes  } from 'unico-webframe';
 import "./Cameras.css"
 import packageJson from "../../package.json";
 
@@ -8,6 +8,12 @@ const Cameras = () => {
   console.log("Loading, camera page");
 
   const navigate = useNavigate();
+
+  const config = new UnicoConfig()
+  
+  .setHostname("<YOUR_HOSTNAME>")
+  
+  .setHostKey("<YOUR_SDKKEY");
 
   const callback = {
     on: {
@@ -41,13 +47,14 @@ const Cameras = () => {
 
   const unicoCamera = new UnicoCheckBuilder()
     .setResourceDirectory("/resources")
-    .setModelsPath("/models")
+    .setModelsPath("http://localhost:3000/models")
+    .setEnvironment(SDKEnvironmentTypes.UAT)
     .setTheme(unicoTheme)
     .build();
 
   const openSelfieCameraNormal = async () => {
     const cameraPromised = unicoCamera
-      .prepareSelfieCamera("/unico-credentials.json", SelfieCameraTypes.NORMAL)
+      .prepareSelfieCamera(config, SelfieCameraTypes.NORMAL)
       .catch(()=>console.error('Error initializing normal camera'));
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
@@ -55,7 +62,7 @@ const Cameras = () => {
   
   const openSelfieCameraSmart = async () => {
     const cameraPromised = unicoCamera
-      .prepareSelfieCamera("/unico-credentials.json", SelfieCameraTypes.SMART)
+      .prepareSelfieCamera(config, SelfieCameraTypes.SMART)
       .catch(()=>console.error('Error initializing smart camera'));
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
@@ -63,7 +70,7 @@ const Cameras = () => {
 
   const openSelfieCameraLiveness = async () => {
     const cameraPromised = unicoCamera
-      .prepareSelfieCamera("/unico-credentials-liveness.json", SelfieCameraTypes.SMART)
+      .prepareSelfieCamera(config, SelfieCameraTypes.SMART)
       .catch((e)=>{
           console.error('Error initializing liveness camera');
           console.error(e);
@@ -74,7 +81,7 @@ const Cameras = () => {
 
   const openDocumentCameraCNH = async () => {
     const cameraPromised = unicoCamera
-      .prepareDocumentCamera("/unico-credentials.json", DocumentCameraTypes.CNH)
+      .prepareDocumentCamera(config, DocumentCameraTypes.CNH)
       .catch(()=>console.error('Error initializing CNH camera'));
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
@@ -82,7 +89,7 @@ const Cameras = () => {
 
   const openDocumentCameraOutros = async () => {
     const cameraPromised = unicoCamera
-      .prepareDocumentCamera("/unico-credentials.json", DocumentCameraTypes.OTHERS("Teste"))
+      .prepareDocumentCamera(config, DocumentCameraTypes.OTHERS("Teste"))
       .catch(()=>console.error('Error initializing other documents camera'));
     
     cameraPromised.then(cameraOpener => cameraOpener.open(callback));
