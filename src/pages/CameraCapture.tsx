@@ -286,7 +286,8 @@ const CameraCapture = () => {
 
       await handler();
     } catch (errorCatch) {
-      console.error(`Error PREPARING ${cameraType} camera:`, errorCatch);
+      const message = `Error preparing camera type: ${String(cameraType)}`;
+      console.error(message, errorCatch);
       const errorMessage = errorCatch instanceof Error ? errorCatch.message : String(errorCatch);
       setError(`Failed to initialize camera (${cameraType}). ${errorMessage}. Please check permissions and try again.`);
       setTimeout(() => setError(null), 7000);
