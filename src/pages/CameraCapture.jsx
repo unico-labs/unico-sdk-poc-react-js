@@ -14,18 +14,16 @@ import '../styles/CameraCapture.css';
 
 const CameraCapture = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // SDK Unico-Webframe authentication keys
   const config = new UnicoConfig()
     .setHostname("<YOUR_HOSTNAME>")
-    .setHostKey("<YOUR_SDKKEY");
+    .setHostKey("<YOUR_SDKKEY>");
 
-  // Configuration of the callback for image capture events and error handling
   const callback = {
     on: {
-      success: function(obj: any) {
+      success: function (obj) {
         console.log("Success capturing image");
         navigate("/photo-result", {
           state: {
@@ -34,25 +32,19 @@ const CameraCapture = () => {
           }
         });
       },
-      error: function(error: any) {
-        console.error("unico-webframe error:", {
-          code: error?.code,
-          message: error?.message,
-          fullError: error
-        });
-    
+      error: function (error) {
+        console.error("unico-webframe error:", error);
         setError(
           `Capture error: ${error?.message || 'Unknown error occurred'}. Check console for details.`
         );
         setTimeout(() => setError(null), 5000);
       },
-      user_canceled: function() {
+      user_canceled: function () {
         console.log("Capture canceled by user.");
       }
     }
   };
 
-  // SDK visual theme definition
   const unicoTheme = new UnicoThemeBuilder()
     .setColorSilhouetteSuccess("#0384fc")
     .setColorSilhouetteError("#D50000")
@@ -74,7 +66,6 @@ const CameraCapture = () => {
     `)
     .build();
 
-  // Main camera instance with theme
   const unicoCamera = new UnicoCheckBuilder()
     .setResourceDirectory("/resources")
     .setModelsPath("/models")
@@ -82,82 +73,77 @@ const CameraCapture = () => {
     .setTheme(unicoTheme)
     .build();
 
-  // Functions to open different camera modes
   const openSelfieCameraLiveness = async () => {
     const cameraPromised = unicoCamera
       .prepareSelfieCamera(config, SelfieCameraTypes.LIVENESS)
       .catch(() => console.error('Error initializing liveness camera'));
-
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
 
   const openDocumentCameraCNH = async () => {
     const cameraPromised = unicoCamera
       .prepareDocumentCamera(config, DocumentCameraTypes.CNH)
       .catch(() => console.error('Error initializing CNH camera'));
-
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
 
   const openDocumentCameraCPF = async () => {
     const cameraPromised = unicoCamera
       .prepareDocumentCamera(config, DocumentCameraTypes.CPF)
       .catch(() => console.error('Error initializing CPF camera'));
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
-  
+
   const openDocumentCameraCNHFrente = async () => {
     const cameraPromised = unicoCamera
       .prepareDocumentCamera(config, DocumentCameraTypes.CNH_FRENTE)
       .catch(() => console.error('Error initializing CNH Frente camera'));
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
-  
+
   const openDocumentCameraCNHVerso = async () => {
     const cameraPromised = unicoCamera
       .prepareDocumentCamera(config, DocumentCameraTypes.CNH_VERSO)
       .catch(() => console.error('Error initializing CNH Verso camera'));
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
-  
+
   const openDocumentCameraRGFrente = async () => {
     const cameraPromised = unicoCamera
       .prepareDocumentCamera(config, DocumentCameraTypes.RG_FRENTE)
       .catch(() => console.error('Error initializing RG Frente camera'));
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
-  
+
   const openDocumentCameraRGVerso = async () => {
     const cameraPromised = unicoCamera
       .prepareDocumentCamera(config, DocumentCameraTypes.RG_VERSO)
       .catch(() => console.error('Error initializing RG Verso camera'));
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
-  
+
   const openDocumentCameraRGFrenteNovo = async () => {
     const cameraPromised = unicoCamera
       .prepareDocumentCamera(config, DocumentCameraTypes.RG_FRENTE_NOVO)
       .catch(() => console.error('Error initializing RG Frente Novo camera'));
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
-  
+
   const openDocumentCameraRGVersoNovo = async () => {
     const cameraPromised = unicoCamera
       .prepareDocumentCamera(config, DocumentCameraTypes.RG_VERSO_NOVO)
       .catch(() => console.error('Error initializing RG Verso Novo camera'));
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
 
   const openDocumentCameraOutros = async () => {
     const cameraPromised = unicoCamera
       .prepareDocumentCamera(config, DocumentCameraTypes.OTHERS("Generic Document"))
       .catch(() => console.error('Error initializing other documents camera'));
-
-    cameraPromised.then((cameraOpener: { open: (arg0: { on: { success: (obj: any) => void; error: (error: any) => void; user_canceled: () => void; }; }) => any; }) => cameraOpener.open(callback));
+    cameraPromised.then((cameraOpener) => cameraOpener.open(callback));
   };
 
-  // Maps camera types to their respective functions
-  const cameraHandlers: Record<string, () => Promise<void>> = {
+  const cameraHandlers = {
     liveness: openSelfieCameraLiveness,
     cnh: openDocumentCameraCNH,
     cpf: openDocumentCameraCPF,
@@ -170,8 +156,7 @@ const CameraCapture = () => {
     others: openDocumentCameraOutros,
   };
 
-  // Generic function to open any type of camera with error handling
-  const openCamera = async (cameraType: string) => {
+  const openCamera = async (cameraType) => {
     console.log(`Attempting to open camera: ${cameraType}`);
     setLoading(true);
     setError(null);
@@ -192,7 +177,6 @@ const CameraCapture = () => {
     }
   };
 
-  // List of options for biometric capture
   const features = [
     {
       title: 'Liveness Camera',
@@ -202,62 +186,16 @@ const CameraCapture = () => {
     }
   ];
 
-  // List of options for document capture
   const documentFeatures = [
-    {
-      title: 'CNH Aberta',
-      description: 'Capture Brazilian driver\'s license (CNH)',
-      type: 'cnh',
-      icon: FileText
-    },
-    {
-      title: 'CNH Frente',
-      description: 'Capture front side of CNH',
-      type: 'cnh_frente',
-      icon: FileText
-    },
-    {
-      title: 'CNH Verso',
-      description: 'Capture back side of CNH',
-      type: 'cnh_verso',
-      icon: FileText
-    },
-    {
-      title: 'RG Frente',
-      description: 'Capture front side of RG',
-      type: 'rg_frente',
-      icon: FileText
-    },
-    {
-      title: 'RG Verso',
-      description: 'Capture back side of RG',
-      type: 'rg_verso',
-      icon: FileText
-    },
-    {
-      title: 'RG Frente Novo',
-      description: 'Capture new RG front side',
-      type: 'rg_frente_novo',
-      icon: FileText
-    },
-    {
-      title: 'RG Verso Novo',
-      description: 'Capture new RG back side',
-      type: 'rg_verso_novo',
-      icon: FileText
-    },
-    {
-      title: 'CPF',
-      description: 'Capture CPF',
-      type: 'cpf',
-      icon: FileText
-    },
-    {
-      title: 'Outros Documentos',
-      description: 'Capture other types of identification documents',
-      type: 'others',
-      icon: FileText
-    }
+    { title: 'CNH Aberta', type: 'cnh', description: 'Capture Brazilian driver\'s license (CNH)', icon: FileText },
+    { title: 'CNH Frente', type: 'cnh_frente', description: 'Capture front side of CNH', icon: FileText },
+    { title: 'CNH Verso', type: 'cnh_verso', description: 'Capture back side of CNH', icon: FileText },
+    { title: 'RG Frente', type: 'rg_frente', description: 'Capture front side of RG', icon: FileText },
+    { title: 'RG Verso', type: 'rg_verso', description: 'Capture back side of RG', icon: FileText },
+    { title: 'RG Frente Novo', type: 'rg_frente_novo', description: 'Capture new RG front side', icon: FileText },
+    { title: 'RG Verso Novo', type: 'rg_verso_novo', description: 'Capture new RG back side', icon: FileText },
+    { title: 'CPF', type: 'cpf', description: 'Capture CPF', icon: FileText },
+    { title: 'Outros Documentos', type: 'others', description: 'Capture other types of identification documents', icon: FileText }
   ];
 
   return (
