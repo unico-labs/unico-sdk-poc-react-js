@@ -1,15 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Download } from 'lucide-react';
 
-interface LocationState {
-  base64?: string;
-  jwt?: string;
-}
 
 const PhotoResult = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as LocationState;
+  const state = location.state || {};
 
   if (!state || !state.base64) {
     return (
