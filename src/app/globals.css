@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .unico-loader {
   display: inline-block;
   width: 40px;
@@ -14,14 +18,12 @@
   }
 }
 
-/* Custom styles for the camera box */
 #box-camera {
   width: 100%;
   min-height: 300px;
   position: relative;
 }
 
-/* Additional styling for Unico components */
 :root {
   --unico-primary: #0384fc;
   --unico-secondary: #f3f8fb;
