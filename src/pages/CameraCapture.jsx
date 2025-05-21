@@ -18,8 +18,8 @@ const CameraCapture = () => {
   const navigate = useNavigate();
 
   const config = new UnicoConfig()
-    .setHostname("<YOUR_HOSTNAME>")
-    .setHostKey("<YOUR_SDKKEY>");
+      .setHostname("<YOUR_HOSTNAME>")
+      .setHostKey("<YOUR_SDKKEY>");
 
   const callback = {
     on: {
