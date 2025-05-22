@@ -67,7 +67,7 @@ const CameraCapture = () => {
     .build();
 
   const unicoCamera = new UnicoCheckBuilder()
-    .setResourceDirectory("/resources")
+    // .setResourceDirectory("/resources") /*-- A partir da versão 3.18.0, o SDK busca os recursos adicionais automaticamente se o método setResourceDirectory não for usado e as configurações de CSP estiverem corretas. --*/
     .setModelsPath("/models")
     .setEnvironment(SDKEnvironmentTypes.UAT)
     .setTheme(unicoTheme)
