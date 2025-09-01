@@ -10,7 +10,7 @@ import os
 # ===============================
 URL = "https://devcenter.unico.io/idcloud/integracao/sdk/integracao-sdks/sdk-web/release-notes"
 DEPENDENCY = "unico-webframe"
-REPO_PATH = "target-repo"  # pasta onde o repo de destino foi clonado
+REPO_PATH = "target-repo"  # Pasta onde o repo destino foi clonado
 
 # ===============================
 # 1️⃣ Buscar versão + data no site
@@ -24,7 +24,6 @@ data_release = None
 
 if div:
     texto = div.get_text(strip=True)
-    # Extrai versão e data usando regex: "Versão 3.20.10 - 25/08/2025"
     match = re.search(r"Versão\s+([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", texto)
     if match:
         versao_site = match.group(1)
@@ -58,7 +57,7 @@ if versao_atual != versao_site:
 
     print(f"✅ Atualizado {DEPENDENCY} para versão {versao_site}")
 
-    # Entrar na pasta do repo de destino
+    # Entrar na pasta do repo destino
     os.chdir(REPO_PATH)
     branch = f"update-{DEPENDENCY}-v{versao_site}"
     tag = f"{DEPENDENCY}-v{versao_site}"

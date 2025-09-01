@@ -2,7 +2,7 @@ name: Update Unico SDK in Target Repo
 
 on:
   schedule:
-    - cron: "0 9 * * *"  # todo dia às 9h UTC
+    - cron: "0 9 * * *"  # Todo dia às 9h UTC
   workflow_dispatch:       # Permite rodar manualmente
 
 jobs:
@@ -10,14 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout do repositório de destino sem persistir credenciais
+      # 1️⃣ Checkout do repositório destino sem persistir credenciais
       - name: Checkout destino
         uses: actions/checkout@v4
         with:
           repository: unico-labs/unico-sdk-poc-react-js
           token: ${{ secrets.TARGET_REPO_PAT }}
           path: target-repo
-          persist-credentials: false  # evita vulnerabilidade
+          persist-credentials: false
 
       # 2️⃣ Configurar Python
       - name: Setup Python
