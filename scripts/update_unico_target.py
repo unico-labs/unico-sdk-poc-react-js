@@ -10,7 +10,7 @@ import os
 # ===============================
 URL = "https://devcenter.unico.io/idcloud/integracao/sdk/integracao-sdks/sdk-web/release-notes"
 DEPENDENCY = "unico-webframe"
-REPO_PATH = "target-repo"  # Repo destino clonado pelo workflow
+REPO_PATH = "."  # Caminho para o repositório local
 
 # ===============================
 # 1️⃣ Buscar versão + data no site
@@ -24,6 +24,7 @@ data_release = None
 
 if div:
     texto = div.get_text(strip=True)
+    # Regex ajustado para ser mais flexível com espaços
     match = re.search(r"Versão\s+([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", texto)
     if match:
         versao_site = match.group(1)
@@ -33,8 +34,8 @@ if not versao_site:
     print("❌ Não foi possível capturar a versão do site")
     exit(0)
 
-print("📦 Versão mais recente no site:", versao_site)
-print("🗓️ Data da release:", data_release)
+print(f"📦 Versão mais recente no site: {versao_site}")
+print(f"🗓️ Data da release: {data_release}")
 
 # ===============================
 # 2️⃣ Ler package.json do repo destino
@@ -50,19 +51,20 @@ print(f"📂 Versão atual no package.json: {versao_atual}")
 # 3️⃣ Atualizar se necessário
 # ===============================
 if versao_atual != versao_site:
-    # Atualiza a versão
+    # Atualiza a versão no arquivo
     package_json["dependencies"][DEPENDENCY] = versao_site
     with open(package_json_path, "w", encoding="utf-8") as f:
         json.dump(package_json, f, indent=2, ensure_ascii=False)
 
     print(f"✅ Atualizado {DEPENDENCY} para versão {versao_site}")
 
-    # Entrar na pasta do repo destino
-    os.chdir(REPO_PATH)
+    # os.chdir(REPO_PATH) # REMOVIDO: Esta linha não é mais necessária
+
     branch = f"update-{DEPENDENCY}-v{versao_site}"
     tag = f"{DEPENDENCY}-v{versao_site}"
 
     # Criar branch, commit e push
+    # Todos os comandos git agora rodam no diretório correto
     subprocess.run(["git", "checkout", "-b", branch], check=True)
     subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
     subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
@@ -76,9 +78,7 @@ if versao_atual != versao_site:
 
     # Criar PR usando GitHub CLI
     body = f"""
-    Atualização automática do `{DEPENDENCY}` para versão **{versao_site}**  
-    📅 Data de release: **{data_release}**  
-    🔗 [Release Notes oficiais]({URL})
+    Atualização automática do `{DEPENDENCY}` para versão **{versao_site}** 📅 Data de release: **{data_release}** 🔗 [Release Notes oficiais]({URL})
     """
 
     subprocess.run([
