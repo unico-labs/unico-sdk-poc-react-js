@@ -1,0 +1,40 @@
+name: Update Unico SDK in Target Repo
+
+# Trigger do workflow
+on:
+  schedule:
+    - cron: "0 9 * * *"  # Roda todo dia às 9h UTC
+  workflow_dispatch:       # Permite rodar manualmente
+
+jobs:
+  update-sdk:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout do repositório de destino
+      - name: Checkout destino
+        uses: actions/checkout@v4
+        with:
+          repository: unico-labs/unico-sdk-poc-react-js  # Repositório que será atualizado
+          token: ${{ secrets.TARGET_REPO_PAT }}         # Token com permissão de escrita (PAT)
+          path: target-repo                             # Pasta local onde o repo será clonado
+
+      # 2️⃣ Configurar Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3️⃣ Instalar dependências Python para scraping
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      # 4️⃣ Instalar GitHub CLI para criar PR
+      - name: Install GitHub CLI
+        uses: cli/cli-action@v2
+
+      # 5️⃣ Rodar script de atualização
+      - name: Run update script
+        env:
+          GITHUB_TOKEN: ${{ secrets.TARGET_REPO_PAT }}  # Permissão para criar branch, push e PR
+        run: python scripts/update_unico_target.py
