@@ -30,8 +30,9 @@ jobs:
         run: pip install requests beautifulsoup4
 
       # 4️⃣ Instalar GitHub CLI para criar PR
-      - name: Install GitHub CLI
-        uses: cli/cli-action@v2
+      - name: Setup GitHub CLI
+        uses: actions/setup-gh@v2
+
 
       # 5️⃣ Rodar script de atualização
       - name: Run update script
