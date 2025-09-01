@@ -34,6 +34,15 @@ jobs:
         run: |
           sudo apt update
           sudo apt install gh -y
+      
+      # NOVO PASSO ADICIONADO AQUI 👇
+      # 4.1️⃣ Autenticar o Git com o token
+      - name: Authenticate Git & GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.TARGET_REPO_PAT }}
+        run: |
+          echo "${GH_TOKEN}" | gh auth login --with-token
+          gh auth setup-git
 
       # 5️⃣ Rodar script de atualização
       - name: Run update script
