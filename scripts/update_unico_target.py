@@ -10,7 +10,7 @@ import os
 # ===============================
 URL = "https://devcenter.unico.io/idcloud/integracao/sdk/integracao-sdks/sdk-web/release-notes"
 DEPENDENCY = "unico-webframe"
-REPO_PATH = "target-repo"  # Pasta onde o repo destino foi clonado
+REPO_PATH = "target-repo"  # Repo destino clonado pelo workflow
 
 # ===============================
 # 1️⃣ Buscar versão + data no site

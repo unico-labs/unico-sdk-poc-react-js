@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout do repositório destino sem persistir credenciais
+      # 1️⃣ Checkout do repositório destino (target-repo)
       - name: Checkout destino
         uses: actions/checkout@v4
         with:
@@ -39,4 +39,5 @@ jobs:
       - name: Run update script
         env:
           GITHUB_TOKEN: ${{ secrets.TARGET_REPO_PAT }}
+        working-directory: ./target-repo
         run: python scripts/update_unico_target.py
