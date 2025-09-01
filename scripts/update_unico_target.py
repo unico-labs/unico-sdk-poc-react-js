@@ -6,87 +6,88 @@ import subprocess
 import os
 
 # ===============================
-# Configurações
+# Settings
 # ===============================
 URL = "https://devcenter.unico.io/idcloud/integracao/sdk/integracao-sdks/sdk-web/release-notes"
 DEPENDENCY = "unico-webframe"
-REPO_PATH = "."  # Caminho para o repositório local
+REPO_PATH = "."  # Path to the local repository
 
 # ===============================
-# 1️⃣ Buscar versão + data no site
+# 1️⃣ Fetch version + date from the website
 # ===============================
 response = requests.get(URL)
 soup = BeautifulSoup(response.text, "html.parser")
 div = soup.find("div", class_="flex-1 z-1 max-w-full break-words text-start justify-self-start leading-snug")
 
-versao_site = None
-data_release = None
+site_version = None
+release_date = None
 
 if div:
-    texto = div.get_text(strip=True)
-    # Regex ajustado para ser mais flexível com espaços
-    match = re.search(r"Versão\s+([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", texto)
+    text_content = div.get_text(strip=True)
+    # Regex is adjusted to be more flexible with spaces
+    # It still looks for the Portuguese word "Versão" on the target website
+    match = re.search(r"Versão\s+([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", text_content)
     if match:
-        versao_site = match.group(1)
-        data_release = match.group(2)
+        site_version = match.group(1)
+        release_date = match.group(2)
 
-if not versao_site:
-    print("❌ Não foi possível capturar a versão do site")
+if not site_version:
+    print("❌ Could not capture the version from the website")
     exit(0)
 
-print(f"📦 Versão mais recente no site: {versao_site}")
-print(f"🗓️ Data da release: {data_release}")
+print(f"📦 Latest version on the website: {site_version}")
+print(f"🗓️ Release date: {release_date}")
 
 # ===============================
-# 2️⃣ Ler package.json do repo destino
+# 2️⃣ Read package.json from the target repo
 # ===============================
 package_json_path = os.path.join(REPO_PATH, "package.json")
 with open(package_json_path, "r", encoding="utf-8") as f:
     package_json = json.load(f)
 
-versao_atual = package_json["dependencies"].get(DEPENDENCY)
-print(f"📂 Versão atual no package.json: {versao_atual}")
+current_version = package_json["dependencies"].get(DEPENDENCY)
+print(f"📂 Current version in package.json: {current_version}")
 
 # ===============================
-# 3️⃣ Atualizar se necessário
+# 3️⃣ Update if necessary
 # ===============================
-if versao_atual != versao_site:
-    # Atualiza a versão no arquivo
-    package_json["dependencies"][DEPENDENCY] = versao_site
+if current_version != site_version:
+    # Updates the version in the file
+    package_json["dependencies"][DEPENDENCY] = site_version
     with open(package_json_path, "w", encoding="utf-8") as f:
         json.dump(package_json, f, indent=2, ensure_ascii=False)
 
-    print(f"✅ Atualizado {DEPENDENCY} para versão {versao_site}")
+    print(f"✅ Updated {DEPENDENCY} to version {site_version}")
 
-    # os.chdir(REPO_PATH) # REMOVIDO: Esta linha não é mais necessária
+    # os.chdir(REPO_PATH) # REMOVED: This line is no longer needed
 
-    branch = f"update-{DEPENDENCY}-v{versao_site}"
-    tag = f"{DEPENDENCY}-v{versao_site}"
+    branch = f"update-{DEPENDENCY}-v{site_version}"
+    tag = f"{DEPENDENCY}-v{site_version}"
 
-    # Criar branch, commit e push
-    # Todos os comandos git agora rodam no diretório correto
+    # Create branch, commit, and push
+    # All git commands now run in the correct directory
     subprocess.run(["git", "checkout", "-b", branch], check=True)
     subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
     subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
     subprocess.run(["git", "add", "package.json"], check=True)
-    subprocess.run(["git", "commit", "-m", f"chore: bump {DEPENDENCY} to v{versao_site}"], check=True)
+    subprocess.run(["git", "commit", "-m", f"chore: bump {DEPENDENCY} to v{site_version}"], check=True)
     subprocess.run(["git", "push", "origin", branch], check=True)
 
-    # Criar tag
-    subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {DEPENDENCY} {versao_site} ({data_release})"], check=True)
+    # Create tag
+    subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {DEPENDENCY} {site_version} ({release_date})"], check=True)
     subprocess.run(["git", "push", "origin", tag], check=True)
 
-    # Criar PR usando GitHub CLI
+    # Create PR using GitHub CLI
     body = f"""
-    Atualização automática do `{DEPENDENCY}` para versão **{versao_site}** 📅 Data de release: **{data_release}** 🔗 [Release Notes oficiais]({URL})
+    Automatic update of `{DEPENDENCY}` to version **{site_version}** 📅 Release date: **{release_date}** 🔗 [Official Release Notes]({URL})
     """
 
     subprocess.run([
         "gh", "pr", "create",
-        "--title", f"Update {DEPENDENCY} to v{versao_site}",
+        "--title", f"Update {DEPENDENCY} to v{site_version}",
         "--body", body,
         "--head", branch
     ], check=True)
 
 else:
-    print("🔄 Já está na versão mais recente, nada a fazer.")
+    print("🔄 Already at the latest version, nothing to do.")
