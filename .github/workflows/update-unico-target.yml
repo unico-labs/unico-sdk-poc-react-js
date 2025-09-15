@@ -1,4 +1,4 @@
-name: Update Unico SDK React.js in Target Repo
+name: Update Unico SDK in Target Repo
 
 on:
   schedule:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout do repositório destino
+      # 1️⃣ Checkout do repositório destino (target-repo)
       - name: Checkout destino
         uses: actions/checkout@v4
         with:
@@ -34,36 +34,17 @@ jobs:
         run: |
           sudo apt update
           sudo apt install gh -y
-
+      
       # 4.1️⃣ Autenticar o Git com o token
       - name: Authenticate Git & GitHub CLI
         env:
           GH_TOKEN: ${{ secrets.TARGET_REPO_PAT }}
         run: |
-              echo $GH_TOKEN | gh auth login --with-token
+          gh auth setup-git
 
-      # 5️⃣ Rodar script de atualização e capturar outputs
+      # 5️⃣ Rodar script de atualização
       - name: Run update script
-        id: update-script
         env:
           GITHUB_TOKEN: ${{ secrets.TARGET_REPO_PAT }}
         working-directory: ./target-repo
-        run: |
-          python scripts/update_unico_target.py | tee output.log
-          pr_url=$(grep "https://github.com" output.log || true)
-          echo "pr_url=$pr_url" >> $GITHUB_OUTPUT
-          # Os outputs version e release_date já são exportados pelo script
-
-      # 6️⃣ Notificação no Slack (apenas se houver PR criada)
-      - name: Send Slack notification
-        if: ${{ steps.update-script.outputs.pr_url != '' }}
-        uses: slackapi/slack-github-action@v1.27.0
-        with:
-          channel-id: "D08D9NHCWBF" # seu canal
-          slack-message: |
-            :rocket: A new automatic PR was created in **unico-sdk-poc-react-js**!
-            *SDK Version:* `${{ steps.update-script.outputs.version }}`
-            *Release Date:* `${{ steps.update-script.outputs.release_date }}`
-            *PR Link:* ${{ steps.update-script.outputs.pr_url }}
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: python scripts/update_unico_target.py
