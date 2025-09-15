@@ -4,6 +4,7 @@ import re
 import json
 import subprocess
 import os
+from datetime import datetime
 
 # ===============================
 # Settings
@@ -24,8 +25,6 @@ release_date = None
 
 if div:
     text_content = div.get_text(strip=True)
-    # Regex is adjusted to be more flexible with spaces
-    # It still looks for the Portuguese word "Versão" on the target website
     match = re.search(r"Versão\s+([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", text_content)
     if match:
         site_version = match.group(1)
@@ -33,6 +32,10 @@ if div:
 
 if not site_version:
     print("❌ Could not capture the version from the website")
+    # Export empty outputs for GitHub Actions
+    print("::set-output name=pr_url::")
+    print("::set-output name=version::")
+    print("::set-output name=release_date::")
     exit(0)
 
 print(f"📦 Latest version on the website: {site_version}")
@@ -52,20 +55,17 @@ print(f"📂 Current version in package.json: {current_version}")
 # 3️⃣ Update if necessary
 # ===============================
 if current_version != site_version:
-    # Updates the version in the file
     package_json["dependencies"][DEPENDENCY] = site_version
     with open(package_json_path, "w", encoding="utf-8") as f:
         json.dump(package_json, f, indent=2, ensure_ascii=False)
 
     print(f"✅ Updated {DEPENDENCY} to version {site_version}")
 
-    # os.chdir(REPO_PATH) # REMOVED: This line is no longer needed
-
-    branch = f"update-{DEPENDENCY}-v{site_version}"
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    branch = f"update-{DEPENDENCY}-v{site_version}-{timestamp}"
     tag = f"{DEPENDENCY}-v{site_version}"
 
-    # Create branch, commit, and push
-    # All git commands now run in the correct directory
+    # Create branch, commit, push
     subprocess.run(["git", "checkout", "-b", branch], check=True)
     subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
     subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
@@ -77,9 +77,9 @@ if current_version != site_version:
     subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {DEPENDENCY} {site_version} ({release_date})"], check=True)
     subprocess.run(["git", "push", "origin", tag], check=True)
 
-    # Create PR using GitHub CLI (capture URL)
+    # Create PR using GitHub CLI and capture URL
     body = f"""
-    Automatic update of `{DEPENDENCY}` to version **{site_version}** 📅 Release date: **{release_date}** 🔗 [Official Release Notes]({URL})
+Automatic update of `{DEPENDENCY}` to version **{site_version}** 📅 Release date: **{release_date}** 🔗 [Official Release Notes]({URL})
     """
 
     result = subprocess.run([
@@ -94,14 +94,13 @@ if current_version != site_version:
     pr_url = result.stdout.strip()
     print(f"🔗 Pull Request criada: {pr_url}")
 
-    # Exporta outputs para o GitHub Actions
+    # Export outputs for GitHub Actions
     print(f"::set-output name=pr_url::{pr_url}")
     print(f"::set-output name=version::{site_version}")
     print(f"::set-output name=release_date::{release_date}")
+
 else:
     print("🔄 Already at the latest version, nothing to do.")
-    # Exporta vazio para o GitHub Actions saber que não tem PR
     print("::set-output name=pr_url::")
     print("::set-output name=version::")
     print("::set-output name=release_date::")
-
