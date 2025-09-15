@@ -77,17 +77,31 @@ if current_version != site_version:
     subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {DEPENDENCY} {site_version} ({release_date})"], check=True)
     subprocess.run(["git", "push", "origin", tag], check=True)
 
-    # Create PR using GitHub CLI
+    # Create PR using GitHub CLI (capture URL)
     body = f"""
     Automatic update of `{DEPENDENCY}` to version **{site_version}** 📅 Release date: **{release_date}** 🔗 [Official Release Notes]({URL})
     """
 
-    subprocess.run([
+    result = subprocess.run([
         "gh", "pr", "create",
         "--title", f"Update {DEPENDENCY} to v{site_version}",
         "--body", body,
-        "--head", branch
-    ], check=True)
+        "--head", branch,
+        "--json", "url",
+        "--jq", ".url"
+    ], check=True, capture_output=True, text=True)
 
+    pr_url = result.stdout.strip()
+    print(f"🔗 Pull Request criada: {pr_url}")
+
+    # Exporta outputs para o GitHub Actions
+    print(f"::set-output name=pr_url::{pr_url}")
+    print(f"::set-output name=version::{site_version}")
+    print(f"::set-output name=release_date::{release_date}")
 else:
     print("🔄 Already at the latest version, nothing to do.")
+    # Exporta vazio para o GitHub Actions saber que não tem PR
+    print("::set-output name=pr_url::")
+    print("::set-output name=version::")
+    print("::set-output name=release_date::")
+

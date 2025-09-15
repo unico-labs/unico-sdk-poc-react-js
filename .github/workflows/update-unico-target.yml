@@ -1,17 +1,17 @@
-name: Update Unico SDK in Target Repo
+name: Update Unico SDK React.js in Target Repo
 
 on:
   schedule:
-    - cron: "0 9 */10 * *"   # A cada 10 dias, às 9h UTC
-  workflow_dispatch:       # Permite rodar manualmente
+    - cron: "0 9 */10 * *"   # Every 10 days at 9 AM UTC
+  workflow_dispatch:       # Allows manual triggering
 
 jobs:
   update-sdk:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout do repositório destino (target-repo)
-      - name: Checkout destino
+      # 1️⃣ Checkout the target repository (target-repo)
+      - name: Checkout target repo
         uses: actions/checkout@v4
         with:
           repository: unico-labs/unico-sdk-poc-react-js
@@ -19,32 +19,50 @@ jobs:
           path: target-repo
           persist-credentials: false
 
-      # 2️⃣ Configurar Python
+      # 2️⃣ Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # 3️⃣ Instalar dependências Python
+      # 3️⃣ Install Python dependencies
       - name: Install Python dependencies
         run: pip install requests beautifulsoup4
 
-      # 4️⃣ Instalar GitHub CLI
+      # 4️⃣ Install GitHub CLI
       - name: Install GitHub CLI
         run: |
           sudo apt update
           sudo apt install gh -y
       
-      # 4.1️⃣ Autenticar o Git com o token
+      # 4.1️⃣ Authenticate Git with the token
       - name: Authenticate Git & GitHub CLI
         env:
           GH_TOKEN: ${{ secrets.TARGET_REPO_PAT }}
         run: |
           gh auth setup-git
 
-      # 5️⃣ Rodar script de atualização
+      # 5️⃣ Run update script (captures PR URL or empty)
       - name: Run update script
+        id: update-script
         env:
           GITHUB_TOKEN: ${{ secrets.TARGET_REPO_PAT }}
         working-directory: ./target-repo
-        run: python scripts/update_unico_target.py
+        run: |
+          python scripts/update_unico_target.py | tee output.log
+          pr_url=$(grep "https://github.com" output.log || true)
+          echo "pr_url=$pr_url" >> $GITHUB_OUTPUT
+
+      # 6️⃣ Slack notification (only if a PR was created)
+      - name: Send Slack notification
+        if: ${{ steps.update-script.outputs.pr_url != '' }}
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          channel-id: "D08D9NHCWBF"
+          slack-message: |
+            :rocket: A new automatic PR has been created in the **unico-sdk-poc-react-js** repository!
+            *Version:* `${{ steps.update-script.outputs.version }}`
+            *Release date:* `${{ steps.update-script.outputs.release_date }}`
+            *Link:* ${{ steps.update-script.outputs.pr_url }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
