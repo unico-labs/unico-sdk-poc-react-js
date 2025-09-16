@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      ### Step 0: Checkout the Action's repository (to get access to the script)
+      - name: Checkout Action repository
+        uses: actions/checkout@v4
+
       ### Step 1: Checkout the target repository (target-repo)
       - name: Checkout target
         uses: actions/checkout@v4
@@ -63,7 +67,4 @@ jobs:
           SLACK_CHANNEL: "general" # Optional: You can override the default webhook channel
           SLACK_TITLE: "🚀 New SDK Update Ready for Review"
           SLACK_MESSAGE: |
-            A new version of `unico-webframe` has been released and a PR was created automatically.
-            *New Version:* `${{ steps.update_script.outputs.new_version }}`
-            *Release Date:* `${{ steps.update_script.outputs.release_date }}`
-            *PR Link:* <${{ steps.update_script.outputs.pr_url }}|Click here to review>
+            A new version of `unico-webframe` has been released and a PR was created automatically
