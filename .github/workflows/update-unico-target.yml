@@ -57,14 +57,31 @@ jobs:
 
       ### Step 6: Send Slack notification
       # This step will only run if the 'update_script' step has the output 'updated' set to 'true'
+      # - name: Send Slack Notification
+      #   if: steps.update_script.outputs.updated == 'true'
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #     SLACK_USERNAME: "GitHub Actions Bot"
+      #     SLACK_ICON_EMOJI: ":rocket:"
+      #     SLACK_CHANNEL: "general" # Optional: You can override the default webhook channel
+      #     SLACK_TITLE: "🚀 New SDK Update Ready for Review"
+      #     SLACK_MESSAGE: |
+      #       A new version of `unico-webframe` has been released and a PR was created automatically
+
+      
+      ### Step 6: Send Slack notification
+      # TEMPORARILY MODIFIED FOR TESTING: The 'if' condition is set to always run.
       - name: Send Slack Notification
-        if: steps.update_script.outputs.updated == 'true'
+        if: true # Changed from: steps.update_script.outputs.updated == 'true'
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_USERNAME: "GitHub Actions Bot"
-          SLACK_ICON_EMOJI: ":rocket:"
-          SLACK_CHANNEL: "general" # Optional: You can override the default webhook channel
-          SLACK_TITLE: "🚀 New SDK Update Ready for Review"
+          SLACK_ICON_EMOJI: ":test_tube:"
+          SLACK_TITLE: "TESTE de Notificação de SDK"
           SLACK_MESSAGE: |
-            A new version of `unico-webframe` has been released and a PR was created automatically
+            Esta é uma mensagem de teste da sua Action do GitHub.
+            *Nova Versão:* `1.2.3` (dado de teste)
+            *Data da Release:* `15/09/2025` (dado de teste)
+            *PR Link:* <https://github.com/example/repo/pull/1|Clique aqui para um PR de teste>
