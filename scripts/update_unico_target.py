@@ -57,7 +57,7 @@ if current_version != site_version:
 
     print(f"✅ Updated {DEPENDENCY} to version {site_version}")
 
-    branch = f"update-{DEPENDENCY}-v{site_version}"
+    branch = f"update-{DEPENDENCY}-v{site_version}-{timestamp}"
     tag = f"{DEPENDENCY}-v{site_version}"
 
     # Create branch, commit, and push changes
