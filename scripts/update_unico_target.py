@@ -61,7 +61,7 @@ if current_version != site_version:
     timestamp = int(time.time())
 
     branch = f"update-{DEPENDENCY}-v{site_version}-{timestamp}"
-    tag = f"{DEPENDENCY}-v{site_version}"
+    tag = f"{DEPENDENCY}-v{site_version}-{timestamp}"
 
     # Create branch, commit, and push changes
     subprocess.run(["git", "checkout", "-b", branch], check=True)
