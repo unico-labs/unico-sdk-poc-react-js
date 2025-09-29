@@ -14,21 +14,43 @@ DEPENDENCY = "unico-webframe"
 REPO_PATH = "."  # Path to the local repository
 
 # ===============================
-# Step 1: Fetch version and release date from the website
+# Step 1: Fetch version, release date and notes from the website
 # ===============================
 response = requests.get(URL)
 soup = BeautifulSoup(response.text, "html.parser")
-div = soup.find("div", class_="flex-1 z-1 max-w-full break-words text-start justify-self-start leading-snug")
 
 site_version = None
 release_date = None
+release_notes = []
 
-if div:
-    text_content = div.get_text(strip=True)
-    match = re.search(r"Versão\s+([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", text_content)
+# Find the most recent version header (h2/h3/h4 containing "Versão")
+header = soup.find(
+    lambda tag: tag.name in ["h2", "h3", "h4"] and "Versão" in tag.get_text()
+)
+
+if header:
+    # Extract version number and release date using regex
+    match = re.search(r"Versão\s+([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", header.get_text())
     if match:
         site_version = match.group(1)
         release_date = match.group(2)
+
+    # Collect subsequent elements until another version header is found
+    for sib in header.find_next_siblings():
+        # Stop if another version header is reached
+        if sib.name in ["h2", "h3", "h4"] and "Versão" in sib.get_text():
+            break
+        # If it's a list, extract all <li> items
+        if sib.name in ["ul", "ol"]:
+            for li in sib.find_all("li"):
+                note_text = li.get_text(strip=True)
+                if note_text:
+                    release_notes.append(note_text)
+        # If it's a paragraph or div, extract its text
+        elif sib.name in ["p", "div"]:
+            note_text = sib.get_text(strip=True)
+            if note_text:
+                release_notes.append(note_text)
 
 if not site_version:
     print("❌ Could not capture the version from the website")
@@ -36,6 +58,13 @@ if not site_version:
 
 print(f"📦 Latest version on the website: {site_version}")
 print(f"🗓️ Release date: {release_date}")
+
+if release_notes:
+    print("\n📝 Release notes found:")
+    for note in release_notes:
+        print(f"- {note}")
+else:
+    print("⚠️ No release notes were found.")
 
 # ===============================
 # Step 2: Read package.json from the target repository
@@ -78,9 +107,11 @@ if current_version != site_version:
     # Create Pull Request using GitHub CLI
     body = f"""
     Automatic update of `{DEPENDENCY}` to version **{site_version}** 📅 Release date: **{release_date}** 🔗 [Official Release Notes]({URL})
+
+    📝 Release notes:
+    {chr(10).join(f"- {note}" for note in release_notes)}
     """
 
-    # MODIFIED: Capture the output of the 'gh pr create' command
     pr_process = subprocess.run([
         "gh", "pr", "create",
         "--title", f"Update {DEPENDENCY} to v{site_version}",
@@ -93,7 +124,6 @@ if current_version != site_version:
     print(f"✅ Pull Request created: {pr_url}")
 
     # Export output variables for GitHub Actions
-    # This section writes the necessary data to a file so GitHub Actions can read them
     if "GITHUB_OUTPUT" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "a") as f:
             print(f"updated=true", file=f)
@@ -103,7 +133,6 @@ if current_version != site_version:
 
 else:
     print("🔄 Already at the latest version, nothing to do.")
-    # If nothing was updated, set the 'updated' output to 'false'
     if "GITHUB_OUTPUT" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "a") as f:
             print(f"updated=false", file=f)
