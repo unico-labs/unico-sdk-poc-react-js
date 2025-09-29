@@ -49,7 +49,6 @@ jobs:
           gh auth setup-git
 
       ### Step 5: Run the update script
-      # Added an 'id' to this step so its outputs can be referenced later
       - name: Run update script
         id: update_script
         env:
@@ -71,5 +70,8 @@ jobs:
                 A new version of `unico-webframe` has been released and a PR was automatically created.
                 *📦 Version:* `${{ steps.update_script.outputs.new_version }}`
                 *🗓 Release Date:* `${{ steps.update_script.outputs.release_date }}`
+                *📝 Release Notes:* 
+                ``` 
+                ${{ steps.update_script.outputs.release_notes }}
+                ```
                 *🔗 PR:* <${{ steps.update_script.outputs.pr_url }}|Click here to review>
-
