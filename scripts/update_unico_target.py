@@ -131,10 +131,9 @@ if current_version != site_version:
             print(f"release_date={release_date}", file=f)
             print(f"pr_url={pr_url}", file=f)
             # Join release notes with real line breaks for Slack
-            formatted_notes = "\n".join(release_notes) if release_notes else "No release notes provided."
+            formatted_notes = "\n".join(release_notes).rstrip() if release_notes else "No release notes provided."
             with open(os.environ["GITHUB_OUTPUT"], "a") as f:
                 f.write(f"release_notes<<EOF\n{formatted_notes}\nEOF\n")
-
 
 else:
     print("🔄 Already at the latest version, nothing to do.")
