@@ -130,6 +130,9 @@ if current_version != site_version:
             print(f"new_version={site_version}", file=f)
             print(f"release_date={release_date}", file=f)
             print(f"pr_url={pr_url}", file=f)
+            # Join release notes with line breaks for Slack
+            formatted_notes = "\\n".join(release_notes) if release_notes else "No release notes provided."
+            print(f"release_notes={formatted_notes}", file=f)
 
 else:
     print("🔄 Already at the latest version, nothing to do.")
