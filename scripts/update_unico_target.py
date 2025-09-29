@@ -130,9 +130,10 @@ if current_version != site_version:
             print(f"new_version={site_version}", file=f)
             print(f"release_date={release_date}", file=f)
             print(f"pr_url={pr_url}", file=f)
-            # Join release notes with line breaks for Slack
-            formatted_notes = "\\n".join(release_notes) if release_notes else "No release notes provided."
-            print(f"release_notes={formatted_notes}", file=f)
+            # Join release notes with real line breaks for Slack
+            formatted_notes = "\n".join(release_notes) if release_notes else "No release notes provided."
+            formatted_notes_escaped = formatted_notes.replace("%", "%25").replace("\n", "%0A").replace("\r", "%0D")
+            print(f"release_notes={formatted_notes_escaped}", file=f)
 
 else:
     print("🔄 Already at the latest version, nothing to do.")
