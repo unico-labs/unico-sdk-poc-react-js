@@ -42,10 +42,24 @@ if header:
             break
         # If it's a list, extract all <li> items
         if sib.name in ["ul", "ol"]:
-            for li in sib.find_all("li"):
-                note_text = li.get_text(strip=True)
-                if note_text:
-                    release_notes.append(note_text)
+            # Usamos recursive=False para pegar apenas os <li> de primeiro nível da lista principal
+            for li in sib.find_all("li", recursive=False):
+                # Captura todo o texto do <li>, usando '\n' como separador para elementos aninhados
+                lines = li.get_text(separator='\n', strip=True).split('\n')
+                
+                # Processa as linhas para adicionar a indentação desejada
+                if lines:
+                    # A primeira linha é o item principal
+                    first_line = lines[0]
+                    # As linhas seguintes são sub-itens e devem ser indentadas
+                    # 6 espaços em branco criam uma boa indentação em Markdown (usado pelo Slack e GitHub)
+                    rest_lines = ['      ' + line for line in lines[1:] if line]
+                    
+                    # Junta tudo em uma única string para a nota de versão
+                    full_note = '\n'.join([first_line] + rest_lines)
+                    
+                    if full_note:
+                        release_notes.append(full_note)
         # If it's a paragraph or div, extract its text
         elif sib.name in ["p", "div"]:
             note_text = sib.get_text(strip=True)
