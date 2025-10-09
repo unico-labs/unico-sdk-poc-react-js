@@ -42,24 +42,10 @@ if header:
             break
         # If it's a list, extract all <li> items
         if sib.name in ["ul", "ol"]:
-            # Usamos recursive=False para pegar apenas os <li> de primeiro nível da lista principal
-            for li in sib.find_all("li", recursive=False):
-                # Captura todo o texto do <li>, usando '\n' como separador para elementos aninhados
-                lines = li.get_text(separator='\n', strip=True).split('\n')
-                
-                # Processa as linhas para adicionar a indentação desejada
-                if lines:
-                    # A primeira linha é o item principal
-                    first_line = lines[0]
-                    # As linhas seguintes são sub-itens e devem ser indentadas
-                    # 6 espaços em branco criam uma boa indentação em Markdown (usado pelo Slack e GitHub)
-                    rest_lines = ['      ' + line for line in lines[1:] if line]
-                    
-                    # Junta tudo em uma única string para a nota de versão
-                    full_note = '\n'.join([first_line] + rest_lines)
-                    
-                    if full_note:
-                        release_notes.append(full_note)
+            for li in sib.find_all("li"):
+                note_text = li.get_text(strip=True)
+                if note_text:
+                    release_notes.append(note_text)
         # If it's a paragraph or div, extract its text
         elif sib.name in ["p", "div"]:
             note_text = sib.get_text(strip=True)
@@ -138,8 +124,19 @@ if current_version != site_version:
     print(f"✅ Pull Request created: {pr_url}")
 
     # Export output variables for GitHub Actions
+    if "GITHUB_OUTPUT" in os.environ:
+        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+            print(f"updated=true", file=f)
+            print(f"new_version={site_version}", file=f)
+            print(f"release_date={release_date}", file=f)
+            print(f"pr_url={pr_url}", file=f)
+            # Join release notes with real line breaks for Slack
+            formatted_notes = "\n".join(release_notes).rstrip() if release_notes else "No release notes provided."
+            with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                f.write(f"release_notes<<EOF\n{formatted_notes}\nEOF\n")
 
-    github_output = os.getenv("GITHUB_OUTPUT")
+
+        github_output = os.getenv("GITHUB_OUTPUT")
 
     if github_output:
         with open(github_output, "a") as f:
