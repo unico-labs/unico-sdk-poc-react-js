@@ -124,16 +124,18 @@ if current_version != site_version:
     print(f"✅ Pull Request created: {pr_url}")
 
     # Export output variables for GitHub Actions
-    if "GITHUB_OUTPUT" in os.environ:
-        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-            print(f"updated=true", file=f)
-            print(f"new_version={site_version}", file=f)
-            print(f"release_date={release_date}", file=f)
-            print(f"pr_url={pr_url}", file=f)
-            # Join release notes with real line breaks for Slack
-            formatted_notes = "\n".join(release_notes).rstrip() if release_notes else "No release notes provided."
-            with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-                f.write(f"release_notes<<EOF\n{formatted_notes}\nEOF\n")
+
+    github_output = os.getenv("GITHUB_OUTPUT")
+
+    if github_output:
+        with open(github_output, "a") as f:
+            f.write(f"updated=true\n")
+            f.write(f"new_version={site_version}\n")
+            f.write(f"release_date={release_date}\n")
+            f.write(f"pr_url={pr_url}\n")
+            f.write("release_notes<<EOF\n")
+            f.write(f"{release_notes}\n")
+            f.write("EOF\n")
 
 else:
     print("🔄 Already at the latest version, nothing to do.")
