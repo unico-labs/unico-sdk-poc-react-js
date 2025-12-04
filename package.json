@@ -4,7 +4,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.0",
     "lucide-react": "^0.330.0",
-    "unico-webframe": "3.21.4"
+    "unico-webframe": "3.22.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
