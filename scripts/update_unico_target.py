@@ -9,7 +9,7 @@ import time
 # ===============================
 # Settings
 # ===============================
-URL = "https://devcenter.unico.io/unico-idcloud/by-client-integration/pt/sdk/sdks-disponiveis/sdk-web/release-notes"
+URL = "https://developer.unico.io/pt-BR/developers/sdks-and-tools/web/web-sdk/resources/release-notes"
 DEPENDENCY = "unico-webframe"
 REPO_PATH = "."  # Path to the local repository
 
@@ -21,51 +21,28 @@ soup = BeautifulSoup(response.text, "html.parser")
 
 site_version = None
 release_date = None
-# ✅ Bloco Corrigido: Lógica de extração e formatação das notas
-raw_notes = [] # Lista temporária para coletar os textos brutos
+release_notes = []
 
-header = soup.find(
-    lambda tag: tag.name in ["h2", "h3", "h4"] and "Versão" in tag.get_text()
-)
+# Cada versão fica em um bloco: <h2>X.Y.Z</h2><p>Lançado em: DD/MM/YYYY</p><ul><li>...</li></ul>
+# A primeira <h2> da página é sempre a versão mais recente.
+header = soup.find("h2")
 
 if header:
-    match = re.search(r"Versão\s+([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", header.get_text())
-    if match:
-        site_version = match.group(1)
-        release_date = match.group(2)
+    site_version = header.get_text(strip=True)
 
-    for sib in header.find_next_siblings():
-        if sib.name in ["h2", "h3", "h4"] and "Versão" in sib.get_text():
-            break
-        
-        # 1. Coleta todos os textos brutos da lista <ul>
-        if sib.name in ["ul", "ol"]:
-            for li in sib.find_all("li"):
-                note_text = li.get_text(strip=True)
-                if note_text:
-                    raw_notes.append(note_text)
-        elif sib.name in ["p", "div"]:
-            note_text = sib.get_text(strip=True)
-            if note_text:
-                raw_notes.append(note_text)
+    date_tag = header.find_next_sibling("p")
+    if date_tag:
+        match = re.search(r"(\d{2}/\d{2}/\d{4})", date_tag.get_text())
+        if match:
+            release_date = match.group(1)
 
-# 2. Processa a lista bruta para agrupar sub-itens
-release_notes = []
-if raw_notes:
-    # Adiciona o primeiro item como ponto de partida
-    release_notes.append(raw_notes[0])
-    
-    # Itera sobre o restante das notas para verificar se são sub-itens
-    for i in range(1, len(raw_notes)):
-        current_note = raw_notes[i]
-        
-        # Se a nota atual começar com um padrão numérico (ex: "117 - ..."),
-        # ela é um sub-item e deve ser anexada à nota anterior.
-        if re.match(r'^\d+\s*-\s*', current_note):
-            release_notes[-1] += f"\n      {current_note}" # Adiciona com indentação
-        else:
-            # Caso contrário, é um novo item principal
-            release_notes.append(current_note)
+    notes_tag = header.find_next_sibling("ul")
+    if notes_tag:
+        release_notes = [
+            li.get_text(strip=True)
+            for li in notes_tag.find_all("li")
+            if li.get_text(strip=True)
+        ]
 
 if not site_version:
     print("❌ Could not capture the version from the website")
